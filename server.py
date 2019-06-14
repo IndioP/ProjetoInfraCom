@@ -1,9 +1,12 @@
 from socket import *
+import subprocess
+
 UDP_IP = "127.0.0.1"
-UDP_PORT = 12016
+UDP_PORT = 12019
 
 message = "ad" #my domain
 
+cmd = "ls"
 
 #setando meu dominio no DNS
 sock = socket(AF_INET, SOCK_STREAM)
@@ -24,6 +27,10 @@ while True:
 	print("received Option: ",args[0])	
 	if(args[0] == "END"):
 		break;
+	if(args[0] == "LST"):
+		returned_value = subprocess.check_output(cmd)
+		connectionSocket.send(returned_value)
+		#print('returned_value:',returned_value)
 	connectionSocket.close()
 print("Farewell")
 connectionSocket.close()
