@@ -4,7 +4,7 @@ UDP_IP = "127.0.0.1"
 UDP_PORT = 12019
 
 sock = socket(AF_INET, SOCK_DGRAM) #criando o socket
-sock.bind((UDP_IP,UDP_PORT))
+sock.bind(('',UDP_PORT))
 #sock.listen(1)
 domains = dict()	#criando o dicionario, para armazenar os dominios
 
@@ -16,7 +16,7 @@ domains = dict()	#criando o dicionario, para armazenar os dominios
 
 print("DNS is ON")
 while True:
-	message, addr = sock.recvfrom(2048)
+	message, addr = sock.recvfrom(1024)
 	
 	args = message.decode().split()
 	
@@ -28,6 +28,9 @@ while True:
 		
 		#Adiciona a porta como identificador e o end. IP de destino
 		domains[args[2]] = addr[0] + " " + args[1]
+
+		sock.sendto("ACK".encode(), addr)
+
 		print("Domínios salvos: \n", domains)
 
 	elif(args[0] == "GET"):
