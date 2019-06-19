@@ -1,5 +1,6 @@
 from socket import *
 import subprocess
+import utils
 
 UDP_IP = "127.0.0.1"
 UDP_PORT = 12019
@@ -25,13 +26,16 @@ print("Message: ", messageToDNS)
 
 sock.send(messageToDNS.encode())
 
-while True:
-	messageFromDNS, address = sock.recvfrom(1024)	
-	if(messageFromDNS.decode() == "ACK"):
-		print("ACK Received")
-		break
-	else:
-		sock.send(messageToDNS.encode())
+utils.getACK(sock, messageToDNS, UDP_IP, UDP_PORT)
+
+
+# while True:
+# 	messageFromDNS, address = sock.recvfrom(1024)	
+# 	if(messageFromDNS.decode() == "ACK"):
+# 		print("ACK Received")
+# 		break
+# 	else:
+# 		sock.send(messageToDNS.encode())
 
 
 #Fecha o socket de comunicação com o DNS
