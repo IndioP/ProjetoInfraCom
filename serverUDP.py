@@ -3,13 +3,13 @@ import subprocess
 import utils
 
 UDP_IP = "127.0.0.1"
-UDP_PORT = 12018
+UDP_PORT = 12019
 
 #Pode ser implementado depois
 SERVER_NAME = "www.infracom.com"
 
 #pode ser colocado depois para ser gerado randomicamente
-UDP_PORT_SERVER = 54210
+UDP_PORT_SERVER = 54219
 
 #setando meu dominio no DNS
 sock = socket()
@@ -45,8 +45,6 @@ while True:
 	
 	messageFromClient, addr = sockd.recvfrom(1024)
 
-	
-
 	args = messageFromClient.decode().split()
 
 	print("received Option: ",args[0])	
@@ -55,17 +53,25 @@ while True:
 		sockd.sendto("ACK".encode(), addr)
 		break
 
-	if(args[0] == "LST"):
+	elif(args[0] == "LST"):
 		sockd.sendto("ACK".encode(), addr)
 		returned_value = subprocess.check_output("ls")
 		sockd.sendto(returned_value,addr)
 		print('returned_value:',returned_value.decode())
 
-	#connectionSocket.close()
+	elif(args[0] == "GET"):
+		sockd.sendto("ACK".encode(), addr)
+		file_handle = open(args[1],"rb")
+		last = file_handle.read(1000)
+		while True:
+			new = file_handle.read(1000)
+			if not new:
+				sockd.sendto(("0 ").encode()+last,addr)
+				break
+			sockd.sendto(("1 ").encode()+last,addr)
+			last = new
+		
+		file_handle.close()
+
 print("Farewell")
-#connectionSocket.close()
 sockd.close()
-
-
-
-
