@@ -5,4 +5,4 @@ def getACK(socket, msg, IP, port):
             print("ACK Received")
             return True
         else:
-            sock.send(messageToDNS.encode())
+            sock.send(messageToDNS.encode(), (IP, port))

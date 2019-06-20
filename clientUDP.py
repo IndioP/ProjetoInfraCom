@@ -7,7 +7,7 @@ def showOptions():
 from socket import *
 import utils
 UDP_IP = "127.0.0.1"
-UDP_PORT = 12019
+UDP_PORT = 12018
 
 sock = socket(AF_INET, SOCK_DGRAM) #socket de comunicação servidor cliente
 
@@ -29,12 +29,13 @@ while True:
 
     showOptions()
     op = input()
-    sock2.send(op.encode())
+    sock2.sendto(op.encode(),(serv[0], int(serv[1])))
+    utils.getACK(sock2,op,serv[0],int(serv[1]))
     if(op == "END"):
         break
     if(op == "LST"):
-        resposta = sock2.recvfrom(1024).decode()
-        print(resposta)
+        resposta, addrFake = sock2.recvfrom(1024)
+        print(resposta.decode())
     sock2.close()
 
 #sock.close()

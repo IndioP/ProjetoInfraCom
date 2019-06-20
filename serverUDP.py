@@ -3,7 +3,7 @@ import subprocess
 import utils
 
 UDP_IP = "127.0.0.1"
-UDP_PORT = 12019
+UDP_PORT = 12018
 
 #Pode ser implementado depois
 SERVER_NAME = "www.infracom.com"
@@ -28,16 +28,6 @@ sock.send(messageToDNS.encode())
 
 utils.getACK(sock, messageToDNS, UDP_IP, UDP_PORT)
 
-
-# while True:
-# 	messageFromDNS, address = sock.recvfrom(1024)	
-# 	if(messageFromDNS.decode() == "ACK"):
-# 		print("ACK Received")
-# 		break
-# 	else:
-# 		sock.send(messageToDNS.encode())
-
-
 #Fecha o socket de comunicação com o DNS
 sock.close()
 print("Socket closed")
@@ -55,24 +45,25 @@ while True:
 	
 	messageFromClient, addr = sockd.recvfrom(1024)
 
-	sockd.sendto("ACK".encode(), addr)
+	
 
 	args = messageFromClient.decode().split()
 
 	print("received Option: ",args[0])	
 	
 	if(args[0] == "END"):
+		sockd.sendto("ACK".encode(), addr)
 		break
 
 	if(args[0] == "LST"):
-		print("Hello")
-		#returned_value = subprocess.check_output(cmd)
-		#connectionSocket.send(returned_value)
-		#print('returned_value:',returned_value)
+		sockd.sendto("ACK".encode(), addr)
+		returned_value = subprocess.check_output("ls")
+		sockd.sendto(returned_value,addr)
+		print('returned_value:',returned_value.decode())
 
-	connectionSocket.close()
+	#connectionSocket.close()
 print("Farewell")
-connectionSocket.close()
+#connectionSocket.close()
 sockd.close()
 
 

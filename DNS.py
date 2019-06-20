@@ -1,7 +1,7 @@
 from socket import *
 #IP e Porta do DNS
 UDP_IP = "127.0.0.1"
-UDP_PORT = 12019
+UDP_PORT = 12018
 
 sock = socket(AF_INET, SOCK_DGRAM) #criando o socket
 sock.bind(('',UDP_PORT))
