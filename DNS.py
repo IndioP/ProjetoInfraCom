@@ -15,6 +15,7 @@ domains = dict()	#criando o dicionario, para armazenar os dominios
 # - END para encerrar o servidor
 
 print("DNS is ON")
+
 while True:
 	message, addr = sock.recvfrom(1024)
 	
@@ -34,7 +35,12 @@ while True:
 		print("Domínios salvos: \n", domains)
 
 	elif(args[0] == "GET"):
-		message = domains[args[1]]
+
+		#precisamos saber se o domínio está registrado, caso contrário retorna 404
+		if (args[1] in domains): 
+			message = domains[args[1]]
+		else:
+			message = "404"
 		sock.sendto(message.encode(), addr)
 
 	elif(args[0] == "END"):

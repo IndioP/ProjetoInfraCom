@@ -61,10 +61,12 @@ while True:
 		print('returned_value:',returned_value.decode())
 
 	elif(args[0] == "GET"):
+		
 		sockd.sendto("ACK".encode(), addr)
 		file_handle = open(args[1],"rb")
 		last = file_handle.read(1000)
 		segNumber = randint(0,1000)
+		
 		while True:
 			new = file_handle.read(1000)
 			if not new: 															#if EOF

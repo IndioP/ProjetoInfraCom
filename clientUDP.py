@@ -11,18 +11,39 @@ UDP_PORT = 12019
 
 sock = socket(AF_INET, SOCK_DGRAM) #socket de comunicação servidor cliente
 
-message = input("QUAL Servidor você deseja acessar?\n")
-message = "GET " + message
+serv = ""
 
-print(message)
+message = input("QUAL Servidor você deseja acessar? - Digite Q para sair \n")
 
-sock.sendto(message.encode(), (UDP_IP, UDP_PORT))
-answer, servAddress = sock.recvfrom(2048)
-serv = answer.decode().split()
-print(answer.decode().split())
-sock.close()
+option = True
+isOk = False
 
-while True:
+while option:
+	
+	if(message == "Q"):
+		quit()
+
+	message = "GET " + message
+
+	#print(message)
+
+	sock.sendto(message.encode(), (UDP_IP, UDP_PORT))
+	answer, servAddress = sock.recvfrom(2048)
+
+
+	#Verificamos se o domínio existe
+	if(answer.decode() == "404"):
+		print("Erro 404 - Endereço não encontrado, digite novamente ou digite 'Q' para sair")
+		message = input()
+	else:
+		isOk = True
+		option = False
+		serv = answer.decode().split()
+		sock.close()
+
+
+
+while (True and isOk):
 	#criando o socket de comunicação cliente servidor
 	sock2 = socket(AF_INET, SOCK_DGRAM)	
 	sock2.sendto("ACK".encode(), (serv[0], int(serv[1])))
