@@ -1,6 +1,7 @@
 from socket import *
 import subprocess
 import utils
+from random import *
 
 UDP_IP = "127.0.0.1"
 UDP_PORT = 12019
@@ -63,12 +64,14 @@ while True:
 		sockd.sendto("ACK".encode(), addr)
 		file_handle = open(args[1],"rb")
 		last = file_handle.read(1000)
+		segNumber = randint(0,1000)
 		while True:
 			new = file_handle.read(1000)
-			if not new:
-				sockd.sendto(("0 ").encode()+last,addr)
+			if not new: 															#if EOF
+				sockd.sendto(("0 " + str(segNumber)+" ").encode() + last,addr)
 				break
-			sockd.sendto(("1 ").encode()+last,addr)
+			sockd.sendto(("1 "+ str(segNumber)+" ").encode() + last,addr)
+			segNumber+=1000
 			last = new
 		
 		file_handle.close()

@@ -36,18 +36,19 @@ while True:
 		break
 
 	if(op[0] == "LST"):
-		resposta, addrFake = sock2.recvfrom(1024)
+		resposta, addrServer = sock2.recvfrom(1024)
 		print(resposta.decode())
 
 	if(op[0] == "GET"):
 		while True:
-			resposta, addrFake = sock2.recvfrom(1024)
-			aux = resposta.decode().split()
-			print("veio do GET ",resposta.decode())
+			resposta, addrServer = sock2.recvfrom(1024)
+			resposta = resposta.decode()			
+			aux = resposta.split()
+			resposta = resposta[len(aux[0])+1+len(aux[1])+1:]
+			print(resposta)
 			if(aux[0] == "0"):
-				print("veio zero")
 				break
 			if(aux[0] == "1"):
-				print("veio 1")
+				print("chegou 1")
 
 	sock2.close()
