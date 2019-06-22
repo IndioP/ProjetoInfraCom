@@ -44,6 +44,7 @@ while option:
 
 
 while (True and isOk):
+
 	#criando o socket de comunicação cliente servidor
 	sock2 = socket(AF_INET, SOCK_DGRAM)	
 	sock2.sendto("ACK".encode(), (serv[0], int(serv[1])))
@@ -57,6 +58,7 @@ while (True and isOk):
 		break
 
 	if(op[0] == "LST"):
+		
 		resposta, addrServer = sock2.recvfrom(1024)
 		print(resposta.decode())
 
