@@ -63,7 +63,9 @@ while (True and isOk):
 	if(op[0] == "GET"):
 		while True:
 			resposta, addrServer = sock2.recvfrom(1024)
-			resposta = resposta.decode()			
+			resposta = resposta.decode()
+			print(resposta)
+			"""			
 			aux = resposta.split()
 			resposta = resposta[len(aux[0])+1+len(aux[1])+1:]
 			print(resposta)
@@ -71,5 +73,6 @@ while (True and isOk):
 				break
 			if(aux[0] == "1"):
 				print("chegou 1")
+				"""
 
 	sock2.close()

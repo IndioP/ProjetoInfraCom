@@ -1,4 +1,4 @@
-from threading import Timer
+from datetime import datetime, timedelta
 
 #TODO: Implementar timer para o ACK também
 def getACK(socket, msg, IP, port):
@@ -28,18 +28,51 @@ def sendPKTAgain(socket, msg, IP, port):
     #Envia o primeiro segmento
     sock.send(message.encode(), (IP, port))
 
+def timerHasExpired(t1, t2):
+
+    #Tempo de expiração do timer em 1s
+    t3 = timedelta(seconds = 1)
+
+    #Caso tenha se passado 1 segundo, ele retorna falso
+    if((t2 + t3) > t1):
+        return True
+    else:
+        return False
+
 def sendPKT(socket, msg, IP, port):
+
+
+    file_handle = open(args[1], "rb")
+    last = file_handle.read(1000)
+    segNumber = randint(0,1000)
+    
+    while True:
+        new = file_handle.read(1000)
+        if not new: 															#if EOF
+            sockd.sendto(("0 " + str(segNumber)+" ").encode() + last,addr)
+            break
+        sockd.sendto(("1 "+ str(segNumber)+" ").encode() + last,addr)
+        segNumber+=1000
+        last = new
+    
+    file_handle.close()
 
     listSegment = list()
     #Criamos um timer para a resposta do cliente
-    timer = Timer(1.0, sendPKTAgain(socket, msg, IP, port))
     
+    #Pegamos o tempo atual
+    t1 = datetime.now()
+    sendPKT()
+
     while hasPKT():
+
+        t2 = datetime.now()
         if(getACK(socket, msg, IP, port)):
             sendNextPKT()
             resetTimer()
         else:
-            if(timer.hasExpired()):
+            if(timerHasExpired(t1, t2)):
+                t1 = datetime.now()
                 resendPKT()
             else:
                 waitACK()

@@ -1,5 +1,6 @@
 from socket import *
-import subprocess
+#trocado por pathlib
+import pathlib
 import utils
 from random import *
 
@@ -55,15 +56,25 @@ while True:
 		break
 
 	elif(args[0] == "LST"):
+
 		sockd.sendto("ACK".encode(), addr)
-		returned_value = subprocess.check_output("ls")
-		sockd.sendto(returned_value,addr)
-		print('returned_value:',returned_value.decode())
+		
+		files = ""
+
+		path = pathlib.Path('testFiles')
+
+		#Verificamos cada arquivo dentro da pasta especificada
+		for currentFile in path.iterdir():  
+			files = files + str(currentFile) + "\n"
+			print(files)
+
+		sockd.sendto(files.encode(),addr)
+		print('Lista:',files)
 
 	elif(args[0] == "GET"):
 		
 		sockd.sendto("ACK".encode(), addr)
-		file_handle = open(args[1],"rb")
+		file_handle = open(args[1], "rb")
 		last = file_handle.read(1000)
 		segNumber = randint(0,1000)
 		
