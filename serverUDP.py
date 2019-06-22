@@ -68,7 +68,9 @@ while True:
 			files = files + str(currentFile) + "\n"
 			print(files)
 
-		sockd.sendto(files.encode(),addr)
+		sendPKT(socket, files, addr)
+
+		#sockd.sendto(files.encode(),addr)
 		print('Lista:',files)
 
 	elif(args[0] == "GET"):

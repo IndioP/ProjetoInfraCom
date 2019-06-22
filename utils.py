@@ -1,7 +1,8 @@
 from datetime import datetime, timedelta
+from random import *
 
 #TODO: Implementar timer para o ACK também
-def getACK(socket, msg, IP, port):
+def getACK(socket, msg):
 
         messageFromDNS, address = socket.recvfrom(1024)	
         if(messageFromDNS.decode() == "ACK"):
@@ -10,7 +11,7 @@ def getACK(socket, msg, IP, port):
         else:
             return False
 
-def getACKSegment(socket, msg, IP, port, listSegment):
+def getACKSegment(socket, msg, IP, listSegment):
     
         messageFromDNS, address = socket.recvfrom(1024)
         ack = messageFromDNS.decode().split()
@@ -19,14 +20,6 @@ def getACKSegment(socket, msg, IP, port, listSegment):
             return True
         else:
             return False
-
-
-def sendPKTAgain(socket, msg, IP, port):
-    
-    #O pacote vai ser enviado para o cliente e vai esperar um tempo para receber um ack
-
-    #Envia o primeiro segmento
-    sock.send(message.encode(), (IP, port))
 
 def timerHasExpired(t1, t2):
 
@@ -39,40 +32,58 @@ def timerHasExpired(t1, t2):
     else:
         return False
 
-def sendPKT(socket, msg, IP, port):
+#String length in bytes
+def utf8len(s):
+    return len(s.encode('utf-8'))
 
+def hasPKT(listSegment):
+    
+    if not listSegment:
+        return False
+    return True
 
-    file_handle = open(args[1], "rb")
-    last = file_handle.read(1000)
+def sendPKT(socket, msg, addr):
+
+    msglen = utf8len(msg)
+
+    #gera o primeiro segment number
     segNumber = randint(0,1000)
-    
-    while True:
-        new = file_handle.read(1000)
-        if not new: 															#if EOF
-            sockd.sendto(("0 " + str(segNumber)+" ").encode() + last,addr)
-            break
-        sockd.sendto(("1 "+ str(segNumber)+" ").encode() + last,addr)
-        segNumber+=1000
-        last = new
-    
-    file_handle.close()
 
     listSegment = list()
-    #Criamos um timer para a resposta do cliente
-    
+
+    if(msglen > 1000):
+        doSomething(listSegment)
+    else:
+        listSegment.append(segNumber)
+
+    #O Segmento atual a ser enviado
+    segmentoAtual = listSegment[0] 
+
     #Pegamos o tempo atual
     t1 = datetime.now()
-    sendPKT()
 
-    while hasPKT():
+    socket.sendto(("0 " + str(segNumber)+" ").encode(),addr)
+
+    while hasPKT(listSegment):
 
         t2 = datetime.now()
-        if(getACK(socket, msg, IP, port)):
-            sendNextPKT()
-            resetTimer()
+       
+        if(getACK(socket, msg)):
+            #Remove o segmento da lista de envio
+            listSegment.pop(segmentoAtual)
+            
+            #sendNextPKT()
+            #Como demos um pop, pegamos sempre o primeiro valor
+            segmentoAtual = listSegment[0]
+
+
+            #resetamos o timer
+            t1 = datetime.now()
+
         else:
             if(timerHasExpired(t1, t2)):
                 t1 = datetime.now()
-                resendPKT()
-            else:
-                waitACK()
+                #resendPKT()
+                socket.sendto(("0 " + str(segNumber)+" ").encode(),addr)
+            """else:
+                waitACK()"""
