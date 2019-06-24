@@ -30,6 +30,18 @@ def getACK(socket):
     else:
         return False
 
+def timerHasExpired(t1, t2):
+
+    #Tempo de expiração do timer em 1s
+    t3 = timedelta(seconds = 1)
+
+    #Caso tenha se passado 1 segundo, ele retorna falso
+    if((t2 + t3) > t1):
+        print("Timer estourado")
+        return True
+    else:
+        return False
+
 #String length in bytes
 def utf8len(s):
     return len(s.encode('utf-8'))
@@ -120,7 +132,7 @@ def sendFile(socket, msg, addr):
 
             last = new    
 
-            #print("ACK de segmento obtido")
+            print("ACK de segmento obtido")
 
             #Lemos mais 1000 bytes e criamos mais um segmento
             new = file_handle.read(1000)
@@ -130,8 +142,8 @@ def sendFile(socket, msg, addr):
             
             listSegment.append(segNumber)
 
-            #print("Segmento atual: ", segNumber)
-            #print("Fragflag: ", fragflag)
+            print("Segmento atual: ", segNumber)
+            print("Fragflag: ", fragflag)
             
             segmentoAtual = listSegment[0]
 

@@ -1,26 +1,34 @@
 from datetime import datetime, timedelta
 from random import *
 
-#TODO: Implementar timer para o ACK também
-def getACK(socket, msg):
-
-        messageFromDNS, address = socket.recvfrom(1024)	
-        if(messageFromDNS.decode() == "ACK"):
-            print("ACK Received")
-            return True
-        else:
-            return False
-
-def getACKSegment(socket, msg, listSegment):
+def getACKSegment(socket, msg, segment):
     
-        messageFromDNS, address = socket.recvfrom(1024)
-        ack = messageFromDNS.decode().split()
-        if("ACK" in ack):
-            print("Segment ACK Received, Segment: ", ack[1])
-            listSegment.remove(int(ack[1]))
-            return True
-        else:
-            return False
+    socket.settimeout(1)
+    try:
+        message, address = socket.recvfrom(1024)
+    except:
+        return False
+    
+    ack = message.decode().split()
+    if ("ACK" in ack) :
+        segment.remove(int(ack[1]))
+        print("Segment ACK Received, Segment: ", ack[1])
+        return True
+    else:
+        return False
+
+def getACK(socket):
+    
+    socket.settimeout(1)
+    try:
+        message, address = socket.recvfrom(1024)
+    except:
+        return False
+    ack = message.decode().split()
+    if ("ACK" in ack) :
+        return True
+    else:
+        return False
 
 def timerHasExpired(t1, t2):
 
@@ -29,6 +37,7 @@ def timerHasExpired(t1, t2):
 
     #Caso tenha se passado 1 segundo, ele retorna falso
     if((t2 + t3) > t1):
+        print("Timer estourado")
         return True
     else:
         return False
@@ -37,74 +46,61 @@ def timerHasExpired(t1, t2):
 def utf8len(s):
     return len(s.encode('utf-8'))
 
-def hasPKT(listSegment):
+def send(socket, msg, IP, PORT):
     
-    if not listSegment:
-        return False
-    return True
-
-def sendMSG(socket, msg, addr):
-
-    segNumber = randint(0,1000)
-
-    fragflag = 0
-
-    if(utf8len(msg) > 1000):
-        fragflag = 1
-    else:
-        fragflag = 0
-
+    t1 = datetime.now()
+    socket.sendto(msg.encode(), (IP, PORT))
     while True:
-
         t2 = datetime.now()
-    
-        print("Ainda há segmentos, num: ", segNumber)
-        print("Lista de Segmento: ", listSegment)
-        print("Frag flag ", fragflag)
-
-        if(getACKSegment(socket, msg, listSegment) and int(fragflag) > 0):
-            #Remove o segmento da lista de envio
-            #sendNextPKT()
-            read = input()
-
-            socket.sendto((fragflag + str(segNumber) + " ").encode() + last, addr)
-
-            #resetamos o timer
-            t1 = datetime.now()
-
+        if(getACK(socket)):
+            return True
         else:
-            if(timerHasExpired(t1, t2)):
-                t1 = datetime.now()
-                socket.sendto((fragflag + str(segNumber) + " ").encode() + last, addr)
+            socket.sendto(msg.encode(), (IP, PORT))
+        if(timeout(t1,t2)):
+            print("Mensagem não enviada")
+            return False
 
+def sendACK(socket, addr):
+
+    socket.sendto("ACK".encode(), addr)
+    print("ACK enviado")        
+	
+def timeout(t1, t2):
+    t3 = timedelta(seconds = 10)
+
+    if((t2 - t1) > t3):
+        return True
+    return False
+
+def hasPKT(listSegment):
+        
+        if not listSegment:
+            return False
+        return True
 
 def sendFile(socket, msg, addr):
 
     #gera o primeiro segment number
     segNumber = randint(0,1000)
 
-    file_handle = open("test.txt", "rb")
+    print("Opening file " + msg)
+
+    file_handle = open(msg, "rb")
 
     #Lê os primeiros 1000 bytes
     last = file_handle.read(1000)
 
+    listSegment = list()
+
     #Gera o número de segmento
     segNumber = randint(0,1000)
 
-    print("Numero do primeiro segmento: ", segNumber)
-
-    listSegment = list()
-    pkt = []
-
     listSegment.append(segNumber)
 
-    #O Segmento atual a ser enviado
-    segmentoAtual = listSegment[0] 
+    print("Numero do primeiro segmento: ", segNumber)
 
     #Pegamos o tempo atual
     t1 = datetime.now()
-
-    #socket.sendto(("0 " + str(segNumber)+" ").encode(),addr)
 
     #Lemos os próximos 1000 bytes para verificar se vai haver fragmentação ou não
     new = file_handle.read(1000)
@@ -116,51 +112,70 @@ def sendFile(socket, msg, addr):
     else:
         fragflag = "1 "
 
+    toSend = fragflag + str(segNumber)
+    length = utf8len(toSend)
+    leftBytes = ""
+    while(length < 23):
+        leftBytes = leftBytes + " "
+        length = length + 1
+
+    size = (toSend + leftBytes).encode() + last
+
     #Envia a primeira mensagem do arquivo para o cliente
-    socket.sendto((fragflag + str(segNumber) + " ").encode() + last, addr)
+    socket.sendto((toSend + leftBytes).encode() + last, addr)
 
     while hasPKT(listSegment):
 
         t2 = datetime.now()
-    
-        print("Ainda há segmentos, num: ", segNumber)
-        print("Lista de Segmento: ", listSegment)
-        print("Frag flag ", fragflag)
 
         if(getACKSegment(socket, msg, listSegment) and int(fragflag) > 0):
-            #Remove o segmento da lista de envio
-            #sendNextPKT()
 
             last = new    
+
+            #print("ACK de segmento obtido")
 
             #Lemos mais 1000 bytes e criamos mais um segmento
             new = file_handle.read(1000)
             
             #Incrementamos o número de segmento em 1000
             segNumber += 1000    
-
-            listSegment.append(segNumber)
             
-            if not new:
-                fragflag = "0 "
-            else:
-                fragflag = "1 "
-                
+            listSegment.append(segNumber)
+
+            #print("Segmento atual: ", segNumber)
+            #print("Fragflag: ", fragflag)
+            
             segmentoAtual = listSegment[0]
 
-            
+            if not new:
+                fragflag = "0 "
+                finalSegment = True
+            else:
+                fragflag = "1 "
 
-            read = input()
+            toSend = fragflag + str(segNumber)
 
-            socket.sendto((fragflag + str(segNumber) + " ").encode() + last, addr)
+            length = utf8len(toSend)
+
+            #Preenchemos os bytes de controle com espaços caso o número do segmento seja pequeno
+            leftBytes = ""
+            while(length < 23):
+                leftBytes = leftBytes + " "
+                length = length + 1
+
+            size = (toSend + leftBytes).encode() + last
+
+            print("Enviando: ", toSend)
+
+            socket.sendto((toSend + leftBytes).encode() + last, addr)
 
             #resetamos o timer
             t1 = datetime.now()
-
+        
         else:
-            if(timerHasExpired(t1, t2)):
-                t1 = datetime.now()
-                socket.sendto((fragflag + str(segNumber) + " ").encode() + last, addr)
+            print("Reenviando Pacote")
+            socket.sendto((toSend + leftBytes).encode() + last, addr)
 
-            """else:
-                waitACK()"""
+        if timeout(t1,t2):
+            print("Conexão terminada, tempo de resposta muito alto")
+            break
