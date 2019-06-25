@@ -57,8 +57,6 @@ def main():
 		showOptions()
 		op = input()
 		
-		if(op[0] == "END"):
-			break
 		
 		if(not utils.send(sock2, op, serv[0], int(serv[1]))):
 			print("Erro, servidor não recebeu mensagem")
@@ -69,15 +67,16 @@ def main():
 		
 		op = op.split()
 
-
+		if(op[0] == "END"):
+			break
+		
 		if(op[0] == "LST" and isOk):
-			
 			resposta, addrServer = sock2.recvfrom(1024)
 			print(resposta.decode())
 
 		if(op[0] == "GET" and isOk):
 				print("GET " + op[1])
-				f = open("new_"+op[1], "wb")
+				f = open("client/"+op[1], "wb")
 
 				while True:
 					resposta, addrServer = sock2.recvfrom(1024)
@@ -118,3 +117,4 @@ def main():
 
 if __name__ == "__main__":
 	main()
+

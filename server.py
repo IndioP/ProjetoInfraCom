@@ -11,7 +11,7 @@ UDP_PORT = 12019
 SERVER_NAME = "www.infracom.com"
 
 #pode ser colocado depois para ser gerado randomicamente
-UDP_PORT_SERVER = 54219
+UDP_PORT_SERVER = 5422
 
 def main():
 	#setando meu dominio no DNS
@@ -63,14 +63,15 @@ def main():
 			
 			files = ""
 
-			path = pathlib.Path('testFiles')
+			path = pathlib.Path('tests')
 
 			#Verificamos cada arquivo dentro da pasta especificada
 			for currentFile in path.iterdir():  
 				files = files + str(currentFile) + "\n"
 				print(files)
 
-			sendPKT(socket, files, addr)
+			#utils.sendPKT(socket, files, addr)
+			sockd.sendto(files.encode(),addr)
 
 			#sockd.sendto(files.encode(),addr)
 			print('Lista:',files)
@@ -78,7 +79,7 @@ def main():
 		elif(args[0] == "GET"):
 			
 			sockd.sendto("ACK".encode(), addr)
-			msg = args[1]
+			msg = "tests/"+ args[1]
 			utils.sendFile(sockd, msg, addr)
 			print("Returned to main")
 			sockd.setblocking(True)
@@ -88,3 +89,4 @@ def main():
 
 if __name__ == "__main__":
 	main()
+
