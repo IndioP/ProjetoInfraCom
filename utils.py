@@ -90,7 +90,7 @@ def sendFile(socket, msg, addr):
 
     listSegment.append(segNumber)
 
-    print("Numero do primeiro segmento: ", segNumber)
+    #print("Numero do primeiro segmento: ", segNumber)
 
     #Pegamos o tempo atual
     t1 = datetime.now()
@@ -108,11 +108,11 @@ def sendFile(socket, msg, addr):
     toSend = fragflag + str(segNumber)
     length = utf8len(toSend)
     leftBytes = ""
+
+    #Preenchemos os 24 bytes de controle com espaços
     while(length < 23):
         leftBytes = leftBytes + " "
         length = length + 1
-
-    size = (toSend + leftBytes).encode() + last
 
     #Envia a primeira mensagem do arquivo para o cliente
     socket.sendto((toSend + leftBytes).encode() + last, addr)
@@ -142,7 +142,6 @@ def sendFile(socket, msg, addr):
 
             if not new:
                 fragflag = "0 "
-                finalSegment = True
             else:
                 fragflag = "1 "
 
@@ -158,7 +157,7 @@ def sendFile(socket, msg, addr):
 
             size = (toSend + leftBytes).encode() + last
 
-            print("Enviando: ", toSend)
+            #print("Enviando: ", toSend)
 
             socket.sendto((toSend + leftBytes).encode() + last, addr)
 

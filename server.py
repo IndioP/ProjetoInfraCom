@@ -1,5 +1,4 @@
 from socket import *
-#trocado por pathlib
 import pathlib
 import utils
 from random import *
@@ -18,15 +17,12 @@ def worker(addr, message):
 	print("chegou aqui")
 
 	sockd = socket(AF_INET, SOCK_DGRAM)
-	#connectionSocket, addr = sockd.accept()
 
 	args = message.decode().split()
 
 	print("received Option: ",args[0])	
 
 	if(args[0] == "LST"):
-
-		print("Thread " + str(id) + " recebeu a requisicao")
 		
 		sockd.sendto("ACK".encode(), addr)
 		
@@ -39,10 +35,8 @@ def worker(addr, message):
 			files = files + str(currentFile) + "\n"
 			#print(files)
 
-		#utils.sendPKT(socket, files, addr)
 		sockd.sendto(files.encode(),addr)
 
-		#sockd.sendto(files.encode(),addr)
 		print('Lista:',files)
 
 	elif(args[0] == "GET"):
@@ -90,10 +84,8 @@ def main():
 		messageFromClient, addr = sockd.recvfrom(1024)
 		args = messageFromClient.decode().split()
 		print("Aqui")
-		#if(args[0] == "END"):
-		#	sockd.sendto("ACK".encode(), addr)
-		#	break
 
+		#Cria uma thread para cada cliente conectado
 		t = threading.Thread(target=worker, args=(addr, messageFromClient,))
 		t.start()
 		sockd.setblocking(1)
