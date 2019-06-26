@@ -6,8 +6,8 @@ def showOptions():
 
 from socket import *
 import utils
-UDP_IP = "127.0.0.1"
-UDP_PORT = 12019
+UDP_IP = "172.20.4.175"
+UDP_PORT = 12020
 
 def main():
 	sock = socket(AF_INET, SOCK_DGRAM) #socket de comunicação servidor cliente
@@ -75,7 +75,14 @@ def main():
 			print(resposta.decode())
 
 		if(op[0] == "GET" and isOk):
-				print("GET " + op[1])
+			print("GET " + op[1])
+			
+			resposta, addrServer = sock2.recvfrom(1024)
+			resposta = resposta.decode().split()
+			
+			if("404" in resposta):
+				print("Arquivo inexistente")
+			else:
 				f = open("client/"+op[1], "wb")
 
 				while True:
@@ -110,8 +117,7 @@ def main():
 
 					if(fragflag == "0"):
 						break
-						
-
+					
 				f.close()
 
 		sock2.close()

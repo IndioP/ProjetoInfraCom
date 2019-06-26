@@ -6,7 +6,7 @@ from random import *
 import threading
 
 UDP_IP = "127.0.0.1"
-UDP_PORT = 12019
+UDP_PORT = 12020
 
 #Pode ser implementado depois
 SERVER_NAME = "www.infracom.com"
@@ -16,7 +16,6 @@ UDP_PORT_SERVER = 54233
 
 def worker(addr, message):
 	print("chegou aqui")
-
 
 	sockd = socket(AF_INET, SOCK_DGRAM)
 	#connectionSocket, addr = sockd.accept()
@@ -102,7 +101,8 @@ def main():
 
 	print("Farewell")
 	#sockd.close()
-		
+		172.20.4.175
 
 if __name__ == "__main__":
 	main()
+172.20.4.175
