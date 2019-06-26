@@ -101,8 +101,6 @@ def main():
 
 	print("Farewell")
 	#sockd.close()
-		172.20.4.175
 
 if __name__ == "__main__":
 	main()
-172.20.4.175

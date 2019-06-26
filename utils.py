@@ -170,15 +170,5 @@ def sendFile(socket, msg, addr):
             socket.sendto((toSend + leftBytes).encode() + last, addr)
 
         if timeout(t1,t2):
-            printtry:
-        file_handle = open(msg, "rb")
-        socket.sendto("ACK".encode(), addr)
-    except:
-        socket.sendto("404".encode(), addr)
-        returna, tempo de resposta muito alto")
-            breaktry:
-        file_handle = open(msg, "rb")
-        socket.sendto("ACK".encode(), addr)
-    except:
-        socket.sendto("404".encode(), addr)
-        return
+            print("Conexão terminada, tempo de resposta muito alto")
+            break

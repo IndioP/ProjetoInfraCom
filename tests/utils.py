@@ -85,7 +85,12 @@ def sendFile(socket, msg, addr):
 
     print("Opening file " + msg)
 
-    file_handle = open(msg, "rb")
+    try:
+        file_handle = open(msg, "rb")
+        socket.sendto("ACK".encode(), addr)
+    except:
+        socket.sendto("404".encode(), addr)
+        return
 
     #Lê os primeiros 1000 bytes
     last = file_handle.read(1000)
