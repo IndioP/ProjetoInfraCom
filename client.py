@@ -44,7 +44,7 @@ def main():
 			sock.close()
 
 
-
+	listaF = ["END", "GET", "LST"]
 	while (True and DNSok):
 
 		#criando o socket de comunicação cliente servidor
@@ -53,72 +53,75 @@ def main():
 		print("Servidor Porta: ", serv[1])
 		print("Servidor IP: ", serv[0])
 
-		sock2.sendto("ACK".encode(), (serv[0], int(serv[1])))
+		#sock2.sendto("ACK".encode(), (serv[0], int(serv[1])))
 		showOptions()
 		op = input()
 		
-		
-		if(not utils.send(sock2, op, serv[0], int(serv[1]))):
-			print("Erro, servidor não recebeu mensagem")
-			isOk = False
-		else:
-			print("Servidor recebeu mensagem")
-			isOk = True
-		
-		op = op.split()
-
-		if(op[0] == "END"):
-			break
-		
-		if(op[0] == "LST" and isOk):
-			resposta, addrServer = sock2.recvfrom(1024)
-			print(resposta.decode())
-
-		if(op[0] == "GET" and isOk):
-			print("GET " + op[1])
-			
-			resposta, addrServer = sock2.recvfrom(1024)
-			resposta = resposta.decode().split()
-			
-			if("404" in resposta):
-				print("Arquivo inexistente")
+		if(op.split()[0] in listaF):
+			if(not utils.send(sock2, op, serv[0], int(serv[1]))):
+				print("Erro, servidor não recebeu mensagem")
+				isOk = False
 			else:
-				f = open("client/"+op[1], "wb")
+				print("Servidor recebeu mensagem")
+				isOk = True
 
-				while True:
-					sock2.setblocking(True)
-					resposta, addrServer = sock2.recvfrom(1024)
+			op = op.split()
+			
+			if(op[0] == "END"):
+				break
+			
+			elif(op[0] == "LST" and isOk):
+				resposta, addrServer = sock2.recvfrom(1024)
+				print(resposta.decode())
 
-					#print("Receiving bytes: ", len(resposta))
+			elif(op[0] == "GET" and isOk):
+				print("GET " + op[1])
+				
+				resposta, addrServer = sock2.recvfrom(1024)
+				resposta = resposta.decode().split()
+				
+				if("404" in resposta):
+					print("Arquivo inexistente")
+				else:
+					f = open("client/"+op[1], "wb")
 
-					#resposta = resposta.decode()
-					#print(resposta)
-					#primeiros 24 bytes são de controle
-					segmento = resposta[:23]
-					
-					#Os 1000 bytes restantes são os dados
-					data = resposta[23:]
+					while True:
+						sock2.setblocking(True)
+						resposta, addrServer = sock2.recvfrom(1024)
 
-					#Pegamos o número do segmento enviado pelo servidor
-					segmento = segmento.decode().split()
+						#print("Receiving bytes: ", len(resposta))
 
-					print(segmento)
+						#resposta = resposta.decode()
+						#print(resposta)
+						#primeiros 24 bytes são de controle
+						segmento = resposta[:23]
+						
+						#Os 1000 bytes restantes são os dados
+						data = resposta[23:]
 
-					#print(data)			
+						#Pegamos o número do segmento enviado pelo servidor
+						segmento = segmento.decode().split()
 
-					f.write(data)
+						print(segmento)
 
-					#print("Segmento: ", segmento[1])
+						#print(data)			
 
-					fragflag = segmento[0]
-					#seg = input("Digite o segmento de resposta: ")
+						f.write(data)
 
-					sock2.sendto(("ACK " + segmento[1]).encode(), addrServer)
+						#print("Segmento: ", segmento[1])
 
-					if(fragflag == "0"):
-						break
-					
-				f.close()
+						fragflag = segmento[0]
+						#seg = input("Digite o segmento de resposta: ")
+
+						sock2.sendto(("ACK " + segmento[1]).encode(), addrServer)
+
+						if(fragflag == "0"):
+							break
+						
+					f.close()
+		else:
+			print("Opção errada, digite novamente\n")
+
 
 		sock2.close()
 
