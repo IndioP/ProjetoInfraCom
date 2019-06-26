@@ -73,7 +73,12 @@ def sendFile(socket, msg, addr):
 
     print("Opening file " + msg)
 
-    file_handle = open(msg, "rb")
+    try:
+        file_handle = open(msg, "rb")
+        socket.sendto("ACK".encode(), addr)
+    except:
+        socket.sendto("404".encode(), addr)
+        return
 
     #Lê os primeiros 1000 bytes
     last = file_handle.read(1000)
@@ -165,5 +170,15 @@ def sendFile(socket, msg, addr):
             socket.sendto((toSend + leftBytes).encode() + last, addr)
 
         if timeout(t1,t2):
-            print("Conexão terminada, tempo de resposta muito alto")
-            break
+            printtry:
+        file_handle = open(msg, "rb")
+        socket.sendto("ACK".encode(), addr)
+    except:
+        socket.sendto("404".encode(), addr)
+        returna, tempo de resposta muito alto")
+            breaktry:
+        file_handle = open(msg, "rb")
+        socket.sendto("ACK".encode(), addr)
+    except:
+        socket.sendto("404".encode(), addr)
+        return
