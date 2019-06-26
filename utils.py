@@ -137,8 +137,6 @@ def sendFile(socket, msg, addr):
 
             #print("Segmento atual: ", segNumber)
             #print("Fragflag: ", fragflag)
-            
-            segmentoAtual = listSegment[0]
 
             if not new:
                 fragflag = "0 "

@@ -1,12 +1,12 @@
 def showOptions():
-	print("Digite : \"GET [ARQUIVO]\" para baixar o [ARQUIVO]\n")
+	print("\nDigite \"GET [ARQUIVO]\" para baixar o [ARQUIVO]\n")
 	print("Digite \"LST\" para listar os arquivos no Dominio\n")
 	print("Digite \"END\" para encerrar a comunicação\n")
 
 
 from socket import *
 import utils
-UDP_IP = "172.20.4.175"
+UDP_IP = "127.0.0.1"
 UDP_PORT = 12020
 
 def main():
@@ -86,8 +86,15 @@ def main():
 					f = open("client/"+op[1], "wb")
 
 					while True:
-						sock2.setblocking(True)
-						resposta, addrServer = sock2.recvfrom(1024)
+						
+						#Espera 10s
+						sock2.settimeout(10)
+
+						try:
+							resposta, addrServer = sock2.recvfrom(1024)
+						except:
+							print("Servidor demorou a responder")
+							break
 
 						#print("Receiving bytes: ", len(resposta))
 
@@ -119,6 +126,7 @@ def main():
 							break
 						
 					f.close()
+					sock2.setblocking(1)
 		else:
 			print("Opção errada, digite novamente\n")
 
