@@ -79,6 +79,7 @@ def main():
 				f = open("client/"+op[1], "wb")
 
 				while True:
+					sock2.setblocking(True)
 					resposta, addrServer = sock2.recvfrom(1024)
 
 					#print("Receiving bytes: ", len(resposta))
@@ -105,7 +106,7 @@ def main():
 					fragflag = segmento[0]
 					#seg = input("Digite o segmento de resposta: ")
 
-					sock2.sendto(("ACK " + segmento[1]).encode(), (serv[0], int(serv[1])))
+					sock2.sendto(("ACK " + segmento[1]).encode(), addrServer)
 
 					if(fragflag == "0"):
 						break
